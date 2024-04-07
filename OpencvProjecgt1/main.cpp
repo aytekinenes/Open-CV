@@ -2,6 +2,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <iostream>
+#include <opencv2/imgproc.hpp>
 
 
 
@@ -121,6 +122,8 @@ void ShowIPCam(std::string ip)
     }
 }
 
+
+
 cv::Mat CreateBasicPhoto(int genislik, int yukseklik, int blue, int green, int red)
 {
     cv::Mat photo(yukseklik, genislik, CV_8UC3, cv::Scalar(blue, green, red)); //cv_8uc5 = blue, green, red
@@ -131,13 +134,99 @@ cv::Mat CreateBasicPhoto(int genislik, int yukseklik, int blue, int green, int r
 }
 
 
+
+//resim kýrpma
+cv::Mat RectPhoto(string Path, int x, int y, int genislik, int yukseklik)
+{
+    cv::namedWindow("Image in the folder");
+    cv::Mat photo = cv::imread(Path);
+    cv::imshow("image in the folder", photo);
+    cv::waitKey();
+
+    cv::Mat rected_Photo;
+    photo.copyTo(rected_Photo);
+    rected_Photo = cv::Mat(rected_Photo, cv::Rect(x, y, genislik, yukseklik));
+    return rected_Photo;
+}
+
+
+// Resimde çizgi ciz
+cv::Mat DrawLineInPicture(string Path, int x1, int y1, int x2, int y2, int Blue, int Green, int Red, int Thicness)
+{
+    // 
+    cv::Mat RealPhoto = cv::imread(Path);
+    cv::Mat FakePhoto;
+    // !!!! photo max x value = cols, photo min y value = rows
+    RealPhoto.copyTo(FakePhoto);
+    cv::line(FakePhoto, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(Blue, Green, Red, Thicness));
+     
+   // cv::line(FakePhoto, cv::Point(x1, y1), 
+   //      cv::Point(FakePhoto.cols, FakePhoto.rows), cv::Scalar(Blue, Green, Red, Thicness));
+    
+    return FakePhoto;
+    
+
+}
+
+// Resimde dortgen ciz
+cv::Mat DrawRectangle(string Path, int x1, int y1, int x2, int y2, int thickness)
+{
+    cv::Mat photo = cv::imread(Path);
+    cv::Point start(x1, y1);
+    cv::Point end(x2, y2);
+    cv::rectangle(photo, start, end, cv::Scalar(0, 0, 255), 5);
+    return photo;
+}
+
+
+ // Resimde dortgen ciz 2 
+cv::Mat DrawRectangle2(string Path, int x, int y, int width, int heigth, int thickness)
+{
+    cv::Mat photo = cv::imread(Path);
+    cv::rectangle(photo, Rect(x, y, width, heigth), cv::Scalar(0, 0, 255), thickness);
+
+    return photo;
+
+}
+
+// Resim uzerinde text yaz
+cv::Mat WriteTextOnPhoto(string Path, string Text, int x, int y, int Blue, int Green, int Red, 
+    double fontSize, int thickness, bool mirror = false)
+{
+    cv::Mat photo = cv::imread(Path);
+    cv::Mat FakePhoto;
+    cv::Point p(x, y);
+    cv::Point pmirror(x, y + 50);
+    cv::Scalar c(Blue, Green, Red);
+    photo.copyTo(FakePhoto);
+    
+    cv::putText(FakePhoto, Text, p, FONT_ITALIC, fontSize, c, thickness, 8, false);
+    cv::putText(FakePhoto, Text, p, FONT_ITALIC, fontSize, c, thickness, 8, true);
+    return FakePhoto;
+
+}
+
+// Resim uzerinde daire ciz
+cv::Mat DrawCircle(string Path, int x, int y, int radius = 50, 
+    int Blue = 128, int Green = 0, int Red = 128, int thickness= 2)
+{
+    cv::Mat photo = cv::imread(Path);
+    cv::Point center(x, y);
+    cv::Scalar color(Blue, Green, Red);
+    cv::circle(photo,center,  radius, color, thickness);
+    return photo;
+}
+
+
+
+
 int main()
 {
     std::string imgPath = "C:/Users/hp/Desktop/OpencvNS/image/sw.jpg";
     std::string videoPath = "C:/Users/hp/Desktop/OpencvNS/image/semihsayginer.mp4";
     std::string IPCamAddress = "192.168.1.22";
-
-
+    cv::String impPath = "C:/Users/hp/Desktop/OpencvNS/image/sw.jpg";
+    
 
 
     // ShowImage(imgPath);
@@ -155,6 +244,50 @@ int main()
     */
     
 
+    /*
+    // Rect Photo - Resim kýrp
+    cv::imshow("Window1", RectPhoto(imgPath, 0, 0, 400, 200));
+    cv::waitKey();
+    */
+
+
+
+    /*
+    // Draw line - Resimde çizgi çiz
+    cv::imshow("Drawn Photo", DrawLineInPicture(imgPath, 0, 0,500,200, 255, 0, 0, 10));
+    cv::waitKey();
+    */
+
+
+
+
+    /*
+    // Draw Rectangle - Resimde kare ciz 
+    cv::imshow("Draw Rectangle", DrawRectangle(imgPath,50,50,150,150,50));
+    cv::waitKey();
+    */
+
+
+    /*
+    // Draw Rectangle - Resimde kare ciz 2
+    cv::imshow("Draw Rectangle", DrawRectangle2(imgPath, 50, 100, 200, 200, 10));
+    cv::waitKey();
+    */
+
+
+
+    /*
+    // Write text on Photo - Resim uzerine yazi yaz
+    cv::imshow("WriteTextOnPhoto", WriteTextOnPhoto(imgPath, "Open cv C++",200,200,128,0,128, 3, 2,true));
+    cv::waitKey();
+    */
+
+
+
+
+    // Draw circle on Photo - Resim uzerinde daire ciz
+    cv::imshow("Draw Circle", DrawCircle(imgPath,100,100));
+    cv::waitKey();
 
 
     return 0;
