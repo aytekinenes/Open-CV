@@ -217,12 +217,139 @@ cv::Mat DrawCircle(string Path, int x, int y, int radius = 50,
     return photo;
 }
 
+// default bgr = 0 Blue, 1 Green, 2 Red             VEC3D(return unsigned char)
+
+
+
+//  RGB VEC3B
+void ReadValueofPhoto(string Path)
+{
+    cv::Mat photo = cv::imread(Path);
+    cv::imshow("Photo", photo);
+    cv::Mat fakePhoto;
+    photo.copyTo(fakePhoto);
+    cv::waitKey();
+    uchar blue, green, red;
+
+    for (int x = 0; x < photo.cols; x++)
+    {
+        for (int y = 0; y < photo.rows; y++)
+        {
+            blue = fakePhoto.at<Vec3b>(cv::Point(x, y))[0];
+
+            if (blue >100 && blue == 255)
+            {
+                blue = 0;
+                fakePhoto.at<cv::Vec3b>(cv::Point(x, y))[0] = blue;
+            }
+
+        }
+    }
+    cv::imshow("Blue=0", fakePhoto);
+    cv::waitKey();
+
+    return;
+}
+
+void CopyPhoto(cv::Mat photo, cv::Mat &copyPhoto)
+{
+    copyPhoto =  cv::Mat(cv::Size(photo.cols, photo.rows), CV_8UC3);
+    char b, g, r;
+    cv::namedWindow("Copy Period", 1);
+
+    for (int x = 0; x < copyPhoto.cols; x++)
+    {
+        for (int y = 0; y < copyPhoto.rows; y++)
+        {
+            b = photo.at<cv::Vec3b>(cv::Point(x, y))[0]; // blue
+            g = photo.at<cv::Vec3b>(cv::Point(x, y))[1]; // green
+            r = photo.at<cv::Vec3b>(cv::Point(x, y))[2]; // red
+
+            copyPhoto.at<cv::Vec3b>(cv::Point(x, y))[0] = b;
+        //    copyPhoto.at<cv::Vec3b>(cv::Point(x, y))[1] = g;
+            copyPhoto.at<cv::Vec3b>(cv::Point(x, y))[2] = r;
+
+
+            cv::imshow("Copy Period", copyPhoto);
+            cv::waitKey();
+
+        }
+    }
+    cout << "Operating completed" << endl;  
+}
+
+
+// Resmi boyutlandýrarak büyütmek
+cv::Mat BiggerPhoto(cv::Mat photo, int coefficient =2)
+{
+    int newPhotoW  = photo.cols * coefficient;
+    int newPhotoH = photo.rows * coefficient;
+    cv::Mat newPhoto(cv::Size(newPhotoW, newPhotoH), CV_8UC3);
+
+    cv::Vec3b bgr;
+    cout << "Operating Started" << endl;
+    for (int i = 0; i < photo.cols; i++)
+    {
+        for (int j = 0; j < photo.rows; j++)
+        {
+            bgr = photo.at<cv::Vec3b>(cv::Point(i, j));
+            int startX = i * coefficient;
+            int startY = j * coefficient;
+            int endX = startX + coefficient;
+            int endY = startY + coefficient;
+
+            for (int x = startX; x < endX; x++)
+            {
+                for (int y = startY; y < endY; y++)
+                {
+                    newPhoto.at<cv::Vec3b>(cv::Point(x, y)) = bgr;
+                }
+            }
+
+        }
+    }
+    cout << "Operating Completed..." << endl;
+    return newPhoto;
+}
+
+
+cv::Mat SmallerPhoto(cv::Mat photo, int coefficient =2)
+{
+    if (!photo.data && !photo.empty())
+    {
+        cout << "Error ";
+        return cv::Mat::zeros(cv::Size(1, 1), CV_8UC3);
+    }
+    int width = photo.cols / coefficient;
+    int height = photo.rows / coefficient;
+
+    cv::Mat smallPhoto(cv::Size(width, height), CV_8UC3);
+    cv::Vec3b bgrVec;
+
+    cout << "Operating Started" << endl;
+
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            bgrVec = photo.at<cv::Vec3b>(cv::Point(x * coefficient, y * coefficient));
+            smallPhoto.at<cv::Vec3b>(cv::Point(x, y)) = bgrVec;
+
+        }
+    }
+    cout << "Operating Completed" << endl;
+    return smallPhoto;
+}
+
+
 
 
 
 int main()
 {
     std::string imgPath = "C:/Users/hp/Desktop/OpencvNS/image/sw.jpg";
+    std::string rgbImagePath = "C:/Users/hp/Desktop/OpencvNS/image/rgb.png";
+    std::string eImagePath = "C:/Users/hp/Desktop/OpencvNS/image/Eee.png";
     std::string videoPath = "C:/Users/hp/Desktop/OpencvNS/image/semihsayginer.mp4";
     std::string IPCamAddress = "192.168.1.22";
     cv::String impPath = "C:/Users/hp/Desktop/OpencvNS/image/sw.jpg";
@@ -284,10 +411,71 @@ int main()
 
 
 
-
+    /*
     // Draw circle on Photo - Resim uzerinde daire ciz
     cv::imshow("Draw Circle", DrawCircle(imgPath,100,100));
     cv::waitKey();
+    */
+
+
+    /*
+    // Foto uzerinde RGB renklerin deðiþtirilmesi
+    ReadValueofPhoto(rgbImagePath);
+    */
+
+
+
+
+    /*
+    // copy Photo - Resim kopyalama
+    cv::Mat photo = cv::imread(eImagePath);
+    cv::Mat copyPhoto;
+
+    CopyPhoto(photo, copyPhoto);
+    cv::imshow("CopyPhoto", copyPhoto);
+    cv::waitKey();
+    */
+
+
+
+
+
+    /*
+    // Resim boyutlandýrma - Enlarge photo
+    cv::Mat OriginalPhoto = imread(imgPath);
+    cv::Mat newPhoto = BiggerPhoto(OriginalPhoto);
+
+    cv::imshow("Original Photo", OriginalPhoto);
+    cv::imshow("Enlarge Photo", newPhoto);
+    cv::waitKey();
+    */
+
+
+    
+
+
+/*
+    // Resmi Kucultmek // smaller Photo
+
+    string window1 = "Original Photo";
+    string window2 = "Smaller Photo";
+
+    cv::namedWindow(window1);
+    cv::namedWindow(window2);
+
+
+    cv::Mat OriginalPhoto = cv::imread(imgPath);
+    cv::imshow(window1, OriginalPhoto);
+
+    cv::Mat smallPhoto = SmallerPhoto(OriginalPhoto);
+    cv::imshow(window2, smallPhoto);
+    cv::waitKey();
+*/
+
+
+
+
+
 
 
     return 0;
