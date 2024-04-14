@@ -342,6 +342,89 @@ cv::Mat SmallerPhoto(cv::Mat photo, int coefficient =2)
 }
 
 
+cv::Mat blurFunction(cv::Mat blurPhoto, int blurValue=1)
+{    
+    cv::Mat newPhoto = cv::Mat::zeros(cv::Size(blurPhoto.cols, blurPhoto.rows), CV_8UC3);
+
+    int blue = 0, green = 0, red = 0;
+    int counter = 0;
+
+    for (int x= 0; x < blurPhoto.cols; x++)
+    {
+        for (int y = 0; y < blurPhoto.rows; y++)
+        {
+            // scan for loop
+            for (int startValueX = x - blurValue; startValueX< x+blurValue; startValueX++)
+            {
+                for (int startValueY = y - blurValue; startValueY < y+ blurValue; startValueY++)
+                {
+                    if (startValueX >= 0 && startValueY >= 0 && startValueX < blurPhoto.cols && startValueY < blurPhoto.rows)
+                    {
+                        blue += blurPhoto.at<cv::Vec3b>(cv::Point(startValueX, startValueY))[0];
+                        green += blurPhoto.at<cv::Vec3b>(cv::Point(startValueX, startValueY))[1];
+                        red += blurPhoto.at<cv::Vec3b>(cv::Point(startValueX, startValueY))[2];
+
+                        counter++;
+                    }
+
+                }
+            }
+            blue = blue / counter;
+            green = green / counter;
+            red = red / counter;
+
+            newPhoto.at<cv::Vec3b>(cv::Point(x, y))[0] = blue;
+            newPhoto.at<cv::Vec3b>(cv::Point(x, y))[1] = green;
+            newPhoto.at<cv::Vec3b>(cv::Point(x, y))[2] = red;
+
+            blue = 0; green = 0; red = 0;
+
+        }
+    }
+
+
+    return newPhoto;
+}
+
+
+
+void MouseClick(int olay, int x, int y, int flag, void* veri)
+{
+    //if (olay == CV_EVENT_LBUTTONWOWN)
+    //{
+    //    cout << "left button click";
+
+    //}
+
+    //else if (olay == CV_EVENT_LBUTTONUP)
+    //{
+    //    cout << "left button  unclick "
+    //}
+
+    //cout << "move mouse";
+
+    //else if (olay == CV_EVENT_MOUSEWHEEL)
+    //{
+    //    cout << "mouse wheel moved" << endl;
+    //} 
+}
+
+
+void MouseClickEvent()
+{
+    string windowsName = "Mouse Click Events";
+    cv::Mat photo = cv::Mat::zeros(cv::Size(640, 480), CV_8UC3);
+    cv::imshow(windowsName, photo);
+    // mouse click event
+    cv::setMouseCallback(windowsName, MouseClick);
+
+    cv::waitKey;
+}
+
+
+
+
+
 
 
 
@@ -473,6 +556,20 @@ int main()
 */
 
 
+
+/*
+// Blur photo - Resim blurlama
+    cv::namedWindow("Reel Photo");
+    cv::namedWindow("Blur Photo");
+
+    cv::Mat reelPhoto = cv::imread(imgPath);
+    cv::Mat blurPhoto = blurFunction(reelPhoto,1);
+
+    cv::imshow("Reel Photo", reelPhoto);
+    cv::imshow("Blur Photo", blurPhoto);
+
+    cv::waitKey();
+    */
 
 
 
